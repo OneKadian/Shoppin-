@@ -8,9 +8,8 @@ import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ImageSearchResult } from '../types/image-search';
 import Image from 'next/image';
-import Google from "../../public/Google_2015_logo.svg.png"
+import Google from '../../public/Google_2015_logo.svg.png';
 import Link from 'next/link';
-
 
 interface Result {
   src: string;
@@ -20,6 +19,7 @@ interface Result {
 const Images = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
   const [imageSource, setImageSource] = useState<string>('');
   const [activeButton, setActiveButton] = useState<'search' | 'text' | 'translate'>('search');
   const [crop, setCrop] = useState<Crop>({
@@ -29,10 +29,9 @@ const Images = () => {
     width: 100,
     height: 100,
   });
-
-//   const [results, setResults] = useState([]);
   const [results, setResults] = useState<Result[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isResultsLoading, setIsResultsLoading] = useState(true); // For results
+  const [isImageLoading, setIsImageLoading] = useState(true); // For image
 
   useEffect(() => {
     const imageSourceParam = searchParams.get('image');
@@ -44,10 +43,9 @@ const Images = () => {
 
     setImageSource(imageSourceParam);
 
-    // Fetch results from the scraping API
     const fetchResults = async () => {
       try {
-        setIsLoading(true);
+        setIsResultsLoading(true);
 
         const response = await fetch('/api/image-search', {
           method: 'POST',
@@ -64,7 +62,7 @@ const Images = () => {
       } catch (error) {
         console.error('Error fetching results:', error);
       } finally {
-        setIsLoading(false);
+        setIsResultsLoading(false);
       }
     };
 
@@ -74,7 +72,6 @@ const Images = () => {
   if (!imageSource) {
     return <p>Loading...</p>; // Show a loading state while imageSource is being set
   }
-
 
   return (
     <div className="min-h-screen bg-[#202124] text-white">
@@ -118,55 +115,61 @@ const Images = () => {
       {/* Main Content */}
 <div className="flex h-[calc(100vh-64px)]">
   {/* Left Half - Image Editor */}
-  <div className="w-1/2 p-6 border-r border-gray-700">
-    <div className="relative w-full h-full flex flex-col items-center justify-center gap-4">
-      {/* Find image source button */}
-      <Button 
-        variant="outline" 
-        className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full bg-[#303134] hover:bg-[#303134]/80 border-none"
-      >
-        <Search className="w-4 h-4 mr-2" />
-        Find image source
-      </Button>
+     <div className="w-1/2 p-6 border-r border-gray-700">
+          <div className="relative w-full h-full flex flex-col items-center justify-center gap-4">
+            {/* Find image source button */}
+            <Button
+              variant="outline"
+              className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full bg-[#303134] hover:bg-[#303134]/80 border-none"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Find image source
+            </Button>
 
-      {/* Uploaded Image */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        <ReactCrop
-          crop={crop}
-          onChange={(c) => setCrop(c)}
-          className="max-h-[80%] max-w-[90%]"
-        >
-          <img
-            src={imageSource}
-            alt="Uploaded"
-            className="max-w-[90%] max-h-[80%] object-contain"
-          />
-        </ReactCrop>
-      </div>
+            {/* Uploaded Image or Spinner */}
+            <div className="relative w-full h-full flex items-center justify-center">
+              {isImageLoading && (
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4"></div>
+              )}
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                className={`max-h-[80%] max-w-[90%] ${
+                    isImageLoading ? 'hidden' : 'block'
+                  }`}
+              >
+                <img
+                  src={imageSource}
+                  alt="Uploaded"
+                  className={`max-w-[90%] max-h-[80%] object-contain `}
+                  onLoad={() => setIsImageLoading(false)}
+                />
+              </ReactCrop>
+            </div>
 
-      {/* Action buttons */}
-      <div className="action-buttons-group flex items-center">
-        <button
-          className={`action-button ${activeButton === 'search' ? 'active' : 'inactive'}`}
-          onClick={() => setActiveButton('search')}
-        >
-          Search
-        </button>
-        <button
-          className={`action-button ${activeButton === 'text' ? 'active' : 'inactive'}`}
-          onClick={() => setActiveButton('text')}
-        >
-          Text
-        </button>
-        <button
-          className={`action-button ${activeButton === 'translate' ? 'active' : 'inactive'}`}
-          onClick={() => setActiveButton('translate')}
-        >
-          Translate
-        </button>
-      </div>
-    </div>
-  </div>
+            {/* Action buttons */}
+            <div className="action-buttons-group flex items-center">
+              <button
+                className={`action-button ${activeButton === 'search' ? 'active' : 'inactive'}`}
+                onClick={() => setActiveButton('search')}
+              >
+                Search
+              </button>
+              <button
+                className={`action-button ${activeButton === 'text' ? 'active' : 'inactive'}`}
+                onClick={() => setActiveButton('text')}
+              >
+                Text
+              </button>
+              <button
+                className={`action-button ${activeButton === 'translate' ? 'active' : 'inactive'}`}
+                onClick={() => setActiveButton('translate')}
+              >
+                Translate
+              </button>
+            </div>
+          </div>
+        </div>
 
   {/* Right Half */}
   <div className="w-1/2 flex flex-col bg-white text-black">
