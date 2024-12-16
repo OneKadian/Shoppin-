@@ -31,27 +31,34 @@ const Images = () => {
   });
 
 //   const [results, setResults] = useState([]);
-const [results, setResults] = useState<Result[]>([]);
+  const [results, setResults] = useState<Result[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Extract the image URL from the query parameters
   useEffect(() => {
     const imageSourceParam = searchParams.get('image');
+
     if (!imageSourceParam) {
       router.push('/'); // Redirect to the homepage if no image is provided
       return;
     }
+
     setImageSource(imageSourceParam);
 
     // Fetch results from the scraping API
     const fetchResults = async () => {
       try {
         setIsLoading(true);
+
         const response = await fetch('/api/image-search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ imageUrl: imageSourceParam }),
         });
+
+        if (!response.ok) {
+          throw new Error(`API responded with status ${response.status}`);
+        }
+
         const data = await response.json();
         setResults(data);
       } catch (error) {
@@ -67,6 +74,7 @@ const [results, setResults] = useState<Result[]>([]);
   if (!imageSource) {
     return <p>Loading...</p>; // Show a loading state while imageSource is being set
   }
+
 
   return (
     <div className="min-h-screen bg-[#202124] text-white">

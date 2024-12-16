@@ -1,34 +1,54 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
+);
+
+const BUCKET_NAME = "shoppin";
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const file = formData.get('file');
+    const file = formData.get("file");
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    // Ensure file is present and is of a valid type
+    if (!file || !(file instanceof Blob)) {
+      return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filePath = path.join(UPLOAD_DIR, file.name);
+    // Convert the file to an ArrayBuffer
+    const fileArrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(fileArrayBuffer);
 
-    // Ensure upload directory exists
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    const fileName = `${Date.now()}-${file.name || "uploaded-file"}`; // Unique filename
+
+    // Upload the file to Supabase
+    const { data, error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(fileName, buffer, {
+        contentType: file.type || "application/octet-stream",
+        cacheControl: "3600", // Optional: Cache control header
+      });
+
+    if (error) {
+      console.error("Supabase upload error:", error.message);
+      return NextResponse.json(
+        { error: "File upload failed" },
+        { status: 500 }
+      );
     }
 
-    // Save file locally
-    fs.writeFileSync(filePath, buffer);
+    // Generate the public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(fileName);
 
-    return NextResponse.json({
-      url: `/uploads/${file.name}`,
-    });
+    return NextResponse.json({ url: publicUrlData.publicUrl });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'File upload failed' }, { status: 500 });
+    console.error("Upload error:", error.message, error.stack);
+    return NextResponse.json({ error: "File upload failed" }, { status: 500 });
   }
 }

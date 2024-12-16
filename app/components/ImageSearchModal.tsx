@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { Image, X } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
+
+
 interface ImageSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -12,6 +14,8 @@ interface ImageSearchModalProps {
 const ImageSearchModal = ({ isOpen, onClose }: ImageSearchModalProps) => {
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState('');
+
+  
 
   const handleImageUpload = (file: File | string) => {
     if (typeof file === 'string') {
@@ -33,30 +37,30 @@ const ImageSearchModal = ({ isOpen, onClose }: ImageSearchModalProps) => {
     router.push('/images');
   };
 
-  // const onDrop = useCallback((acceptedFiles: File[]) => {
-  //   if (acceptedFiles[0]) {
-  //     handleImageUpload(acceptedFiles[0]);
-  //   }
-  // }, []);
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+const onDrop = useCallback(async (acceptedFiles: File[]) => {
   if (acceptedFiles[0]) {
     const formData = new FormData();
     formData.append('file', acceptedFiles[0]);
 
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      router.push(`/images?image=${encodeURIComponent(data.url)}`);
-    } else {
-      console.error('File upload failed');
+      if (response.ok) {
+        const data = await response.json();
+        // Redirect to the /images page with the uploaded image URL
+        router.push(`/images?image=${encodeURIComponent(data.url)}`);
+      } else {
+        console.error('File upload failed');
+      }
+    } catch (error) {
+      console.error('Error during file upload');
     }
   }
 }, []);
+
   
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
