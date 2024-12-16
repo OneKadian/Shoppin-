@@ -1,6 +1,6 @@
 import React from 'react';
 import { Beaker } from 'lucide-react';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar } from '../components/ui/avatar';
 
 const Header = () => {
   return (

@@ -3,9 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, Grid, Menu, Camera, Search } from 'lucide-react';
-import { Button } from '../components/ui/button'; // Adjust this path to match your project structure
+import { Button } from '../components/ui/button';
 import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { ImageSearchResult } from '../types/image-search';
+
+interface Result {
+  src: string;
+  link: string;
+}
 
 const Images = () => {
   const router = useRouter();
@@ -20,6 +26,10 @@ const Images = () => {
     height: 100,
   });
 
+//   const [results, setResults] = useState([]);
+const [results, setResults] = useState<Result[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   // Extract the image URL from the query parameters
   useEffect(() => {
     const imageSourceParam = searchParams.get('image');
@@ -28,6 +38,26 @@ const Images = () => {
       return;
     }
     setImageSource(imageSourceParam);
+
+    // Fetch results from the scraping API
+    const fetchResults = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: imageSourceParam }),
+        });
+        const data = await response.json();
+        setResults(data);
+      } catch (error) {
+        console.error('Error fetching results:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchResults();
   }, [router, searchParams]);
 
   if (!imageSource) {
@@ -124,7 +154,7 @@ const Images = () => {
         </div>
 
         {/* Right Half - Loading State */}
-        <div className="w-1/2 flex flex-col bg-white text-black">
+        {/* <div className="w-1/2 flex flex-col bg-white text-black">
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-16 h-16 text-red-500 mb-4">
               <svg viewBox="0 0 1024 1024" className="w-full h-full">
@@ -133,7 +163,6 @@ const Images = () => {
                   d="M544 768v128h-64V768H544zm256-384a288 288 0 1 0-576 0c0 118.144 94.528 272.128 288 456.576C705.472 656.128 800 502.144 800 384zM512 960C277.312 746.688 160 565.312 160 384a352 352 0 0 1 704 0c0 181.312-117.312 362.688-352 576z"
                 />
               </svg>
-              {/* 🍓 */}
             </div>
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mb-4"></div>
             <p className="text-black">Results are loadin'</p>
@@ -148,7 +177,49 @@ const Images = () => {
             <button className="text-sm text-blue-600 hover:underline">Yes</button>
             <button className="text-sm text-blue-600 hover:underline">No</button>
           </div>
-        </div>
+        </div> */}
+        <div className="w-1/2 flex flex-col bg-white text-black">
+    {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mb-4"></div>
+            <p className="text-black">Results are loadin'</p>
+          </div>
+        ) : (
+          <div className="flex flex-col p-4 space-y-4">
+            {results.map((result, index) => (
+              <a
+                key={index}
+                href={result.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-4"
+              >
+                <img
+                  src={result.src}
+                  alt={`Result ${index + 1}`}
+                  className="w-16 h-16 object-cover"
+                />
+                <p className="text-sm text-gray-700">Image Result {index + 1}</p>
+              </a>
+            ))}
+          </div>
+        )}
+  {/* Footer */}
+  <div className="h-16 border-t border-gray-200 flex items-center justify-center gap-2">
+    <div className="flex items-center gap-2 text-sm text-gray-600">
+      <svg className="w-4 h-4" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M11 17h2v-6h-2v6Zm1-8q.425 0 .713-.288T13 8q0-.425-.288-.713T12 7q-.425 0-.713.288T11 8q0 .425.288.713T12 9Zm0 13q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Zm0-2q3.35 0 5.675-2.325T20 12q0-3.35-2.325-5.675T12 4Q8.65 4 6.325 6.325T4 12q0 3.35 2.325 5.675T12 20Zm0-8Z"
+        />
+      </svg>
+      Did you find these results useful?
+    </div>
+    <button className="text-sm text-blue-600 hover:underline">Yes</button>
+    <button className="text-sm text-blue-600 hover:underline">No</button>
+  </div>
+</div>
+
       </div>
     </div>
   );
