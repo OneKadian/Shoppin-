@@ -29,25 +29,28 @@ const Images = () => {
     width: 100,
     height: 100,
   });
-  const [results, setResults] = useState<Result[]>([]);
-  const [isResultsLoading, setIsResultsLoading] = useState(true); // For results
-  const [isImageLoading, setIsImageLoading] = useState(true); // For image
+  const [results, setResults] = useState<Array<{
+    link: string;
+    src: string;
+  }>>([]);
+  const [isResultsLoading, setIsResultsLoading] = useState(true);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   useEffect(() => {
     const imageSourceParam = searchParams.get('image');
 
     if (!imageSourceParam) {
-      router.push('/'); // Redirect to the homepage if no image is provided
+      router.push('/');
       return;
     }
 
     setImageSource(imageSourceParam);
 
-    const fetchResults = async () => {
+    const fetchReverseImageSearch = async () => {
       try {
         setIsResultsLoading(true);
 
-        const response = await fetch('/api/image-search', {
+        const response = await fetch('/api/reverse-image-search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ imageUrl: imageSourceParam }),
@@ -58,19 +61,28 @@ const Images = () => {
         }
 
         const data = await response.json();
-        setResults(data);
+        
+        // Transform the results to match the expected format
+        const transformedResults = data.results.map((src: string, index: number) => ({
+          link: src, // Use the image source as the link
+          src: src,
+          title: `Similar Image ${index + 1}`
+        }));
+
+        setResults(transformedResults);
       } catch (error) {
-        console.error('Error fetching results:', error);
+        console.error('Error fetching reverse image search results:', error);
+        // Optionally set an error state to show to the user
       } finally {
         setIsResultsLoading(false);
       }
     };
 
-    fetchResults();
+    fetchReverseImageSearch();
   }, [router, searchParams]);
 
   if (!imageSource) {
-    return <p>Loading...</p>; // Show a loading state while imageSource is being set
+    return <p>Loading...</p>;
   }
 
   return (
@@ -179,8 +191,14 @@ const Images = () => {
         <p className="text-black">Results are loadin'</p>
       </div>
     ) : (
-      <div className="flex-1 flex flex-col p-4 space-y-4">
-        {results.map((result, index) => (
+
+        <div className="flex-1 flex flex-col p-4 space-y-4">
+      {isResultsLoading ? (
+        <p>Searching for similar images...</p>
+      ) : results.length === 0 ? (
+        <p>No similar images found.</p>
+      ) : (
+        results.map((result, index) => (
           <a
             key={index}
             href={result.link}
@@ -193,10 +211,11 @@ const Images = () => {
               alt={`Result ${index + 1}`}
               className="w-16 h-16 object-cover"
             />
-            <p className="text-sm text-gray-700">Image Result {index + 1}</p>
+            <p className="text-sm text-gray-700">Similar Image {index + 1}</p>
           </a>
-        ))}
-      </div>
+        ))
+      )}
+    </div>
     )}
     {/* Footer */}
     <div className="h-16 border-t border-gray-200 flex items-center justify-center gap-2">
