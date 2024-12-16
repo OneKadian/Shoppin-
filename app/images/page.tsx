@@ -46,7 +46,7 @@ const [results, setResults] = useState<Result[]>([]);
     const fetchResults = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/scrape', {
+        const response = await fetch('/api/image-search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ imageUrl: imageSourceParam }),
