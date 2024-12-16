@@ -10,6 +10,7 @@ import { ImageSearchResult } from '../types/image-search';
 import Image from 'next/image';
 import Google from "../../public/Google_2015_logo.svg.png"
 import Link from 'next/link';
+import { Suspense } from 'react'
 
 interface Result {
   src: string;
@@ -19,6 +20,11 @@ interface Result {
 const Images = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  function Sinch() {
+  const searchParams = useSearchParams()
+ 
+  return <input placeholder="Search..." />
+}
   const [imageSource, setImageSource] = useState<string>('');
   const [activeButton, setActiveButton] = useState<'search' | 'text' | 'translate'>('search');
   const [crop, setCrop] = useState<Crop>({
@@ -68,6 +74,7 @@ const [results, setResults] = useState<Result[]>([]);
   }
 
   return (
+     <Suspense>
     <div className="min-h-screen bg-[#202124] text-white">
       {/* Navbar */}
       <div className="bg-white border-b border-gray-200">
@@ -204,6 +211,7 @@ const [results, setResults] = useState<Result[]>([]);
 </div>
 
     </div>
+    </Suspense>
   );
 };
 
