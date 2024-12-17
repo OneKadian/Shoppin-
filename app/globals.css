@@ -9,7 +9,7 @@
 }
 
 .search-bar {
-  background: #202124;
+  background: #4d5156;
   transition: all 0.3s ease;
 }
 
@@ -19,7 +19,7 @@
 }
 
 .nav-link {
-  @apply text-[#999] hover:text-[#f1f1f1] transition-colors;
+  @apply text-white hover:text-[#f1f1f1] transition-colors;
 }
 
 .language-link {
@@ -52,7 +52,7 @@
 }
 
 .ReactCrop__drag-handle::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 100%;

@@ -11,15 +11,6 @@ interface SearchBarProps {
   onCameraClick: () => void;
 }
 
-const MOCK_SUGGESTIONS = [
-  'google search',
-  'google maps',
-  'google translate',
-  'google drive',
-  'google docs',
-  'google photos',
-  'google meet',
-];
 
 const SearchBar = ({ onCameraClick }: SearchBarProps) => {
   const [query, setQuery] = useState('');
@@ -28,6 +19,14 @@ const SearchBar = ({ onCameraClick }: SearchBarProps) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+        const MOCK_SUGGESTIONS = [
+        `${query} news`,
+        `${query} weather`,
+        `${query} images`,
+        `${query} videos`,
+        `${query} maps`
+      ];
 
   useEffect(() => {
     if (query.trim()) {
@@ -85,95 +84,96 @@ const SearchBar = ({ onCameraClick }: SearchBarProps) => {
   };
 
   return (
-    <div className="w-full max-w-[584px] mx-auto relative">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="search-bar rounded-full flex items-center px-4 py-3 mb-8 border border-gray-700 h-[46px]">
-              <Search className="w-5 h-5 text-gray-400 mr-3" />
-              <input
-                ref={inputRef}
-                type="text"
-                className="bg-transparent flex-1 outline-none text-white text-base"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                aria-label="Search"
-              />
-              <div className="flex items-center gap-1">
-                <button className=" hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={() => {}}>
-                <Image src={Mic} width={30} height={30} alt="Microphone" />
-                </button>
-                <button className=" hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={onCameraClick}>
-                  {/* <svg className="w-6 h-6" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"> */}
-                    {/* ... keep existing code (camera SVG) */}
-                <Image src={Lens} width={30} height={30} alt="Lens" />
-                  {/* </svg> */}
-                </button>
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Search</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+<div className="w-full max-w-[584px] mx-auto relative">
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="search-bar  rounded-full flex items-center px-4 py-3 mb-8 border border-gray-700 h-[46px]">
+          <Search className="w-5 h-5 text-gray-400 mr-3" />
+          <input
+            ref={inputRef}
+            type="text"
+            className="bg-transparent flex-1 outline-none text-white text-base"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            aria-label="Search"
+          />
+          <div className="flex items-center gap-1">
+            <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={() => {}}>
+              <Image src={Mic} width={30} height={30} alt="Microphone" />
+            </button>
+            <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={onCameraClick}>
+              <Image src={Lens} width={30} height={30} alt="Lens" />
+            </button>
+          </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Search</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 
-      {showSuggestions && suggestions.length > 0 && (
-        <div 
-          ref={dropdownRef}
-          className="absolute w-full bg-[#2f3133] rounded-lg shadow-lg mt-[-24px] overflow-hidden z-50"
-        >
-          <div className="py-4">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={suggestion}
-                className={`flex items-center px-4 py-2 cursor-pointer ${
-                  index === selectedIndex ? 'bg-[#3c4043]' : 'hover:bg-[#3c4043]'
-                }`}
-                onClick={() => handleSuggestionClick(suggestion)}
-                onMouseEnter={() => setSelectedIndex(index)}
-              >
-                <ArrowUp className="w-4 h-4 text-gray-400 mr-4 transform -rotate-90" />
-                <span className="text-white">{suggestion}</span>
-              </div>
-            ))}
+  {showSuggestions && suggestions.length > 0 && (
+    <div className="flex justify-center rounded-t-lg">
+<div 
+  ref={dropdownRef}
+  className="absolute w-[95%] bg-[#2f3133] rounded-t-lg shadow-lg mt-[-22px] overflow-hidden z-50"
+>
+
+      <div className="py-4 rounded-t-lg">
+        {suggestions.map((suggestion, index) => (
+          <div
+            key={suggestion}
+            className={`flex items-center px-4 py-2 cursor-pointer ${
+              index === selectedIndex ? 'bg-[#3c4043]' : 'hover:bg-[#3c4043]'
+            }`}
+            onClick={() => handleSuggestionClick(suggestion)}
+            onMouseEnter={() => setSelectedIndex(index)}
+          >
+            <ArrowUp className="w-4 h-4 text-gray-400 mr-4 transform -rotate-90" />
+            <span className="text-white">{suggestion}</span>
           </div>
-          
-          <div className="border-t border-gray-700 p-4 flex justify-center space-x-3">
-            <button 
-              onClick={handleSearch}
-              className="px-4 py-2 bg-[#303134] hover:bg-[#3c4043] rounded text-sm text-white"
-            >
-              Google Search
-            </button>
-            <button 
-              onClick={handleFeelingLucky}
-              className="px-4 py-2 bg-[#303134] hover:bg-[#3c4043] rounded text-sm text-white"
-            >
-              I'm Feeling Lucky
-            </button>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
       
-      {!showSuggestions && (
-        <div className="flex justify-center space-x-3">
-          <button 
-            onClick={handleSearch}
-            className="px-4 py-2 bg-[#303134] hover:bg-[#3c4043] rounded text-sm text-white"
-          >
-            Google Search
-          </button>
-          <button 
-            onClick={handleFeelingLucky}
-            className="px-4 py-2 bg-[#303134] hover:bg-[#3c4043] rounded text-sm text-white"
-          >
-            I'm Feeling Lucky
-          </button>
-        </div>
-      )}
+      <div className="border-t border-gray-700 p-4 flex rounded-b-lg justify-center space-x-3">
+        <button 
+          onClick={handleSearch}
+          className="px-4 py-2 bg-[#3c4043] hover:bg-[#3c4043] rounded text-sm text-white"
+        >
+          Google Search
+        </button>
+        <button 
+          onClick={handleFeelingLucky}
+          className="px-4 py-2 bg-[#3c4043] hover:bg-[#3c4043] rounded text-sm text-white"
+        >
+          I'm Feeling Lucky
+        </button>
+      </div>
     </div>
+    </div>
+  )}
+  
+  {!showSuggestions && (
+    <div className="flex justify-center space-x-3">
+      <button 
+        onClick={handleSearch}
+        className="px-4 py-2 bg-[#303134] hover:bg-[#3c4043] rounded text-sm text-white"
+      >
+        Google Search
+      </button>
+      <button 
+        onClick={handleFeelingLucky}
+        className="px-4 py-2 bg-[#303134] hover:bg-[#3c4043] rounded text-sm text-white"
+      >
+        I'm Feeling Lucky
+      </button>
+    </div>
+  )}
+</div>
+
   );
 };
 
