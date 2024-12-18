@@ -1,67 +1,61 @@
-// pages/api/reverse-search.js
-import puppeteer from "puppeteer";
+import { google } from "googlethis";
+import fs from "fs/promises";
+import path from "path";
+import { NextResponse } from "next/server";
+import axios from "axios";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { imageUrl } = req.body;
-
-  if (!imageUrl) {
-    return res.status(400).json({ error: "Image URL is required" });
-  }
-
+export async function POST(req) {
   try {
-    const browser = await puppeteer.launch({
-      headless: false, // Run with UI for easier debugging
-      args: ["--no-sandbox", "--disable-setuid-sandbox"], // Avoid permissions issues
-    });
+    const { imageUrl } = await req.json();
 
-    const page = await browser.newPage();
-
-    // Set a random user agent to avoid bot detection
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
-    );
-
-    // Go to Google Images reverse search
-    await page.goto("https://images.google.com", {
-      waitUntil: "networkidle2",
-    });
-
-    // Click on the "Search by Image" button
-    const cameraButtonSelector = "button[aria-label='Search by image']";
-    await page.waitForSelector(cameraButtonSelector);
-    await page.click(cameraButtonSelector);
-
-    // Input the image URL and perform the search
-    const inputSelector = "input[type='text']";
-    await page.waitForSelector(inputSelector);
-    await page.type(inputSelector, imageUrl);
-    await page.keyboard.press("Enter");
-
-    // Wait for results to load
-    await page.waitForSelector(".rg_i", { timeout: 15000 });
-
-    // Scrape the top 10 results
-    const results = await page.evaluate(() => {
-      const images = Array.from(document.querySelectorAll(".rg_i")).slice(
-        0,
-        10
+    if (!imageUrl) {
+      return NextResponse.json(
+        { error: "Image URL is required" },
+        { status: 400 }
       );
-      return images.map((img) => ({
-        image: img.getAttribute("src"),
-        link: img.closest("a").href,
-      }));
-    });
+    }
 
-    await browser.close();
-    return res.status(200).json(results);
+    // Fetch the image from the URL
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    const imageBuffer = Buffer.from(response.data);
+
+    // Define a temporary file path
+    const tempFilePath = path.join(process.cwd(), "temp-image.jpg");
+
+    // Save the image temporarily
+    await fs.writeFile(tempFilePath, imageBuffer);
+
+    try {
+      // Perform reverse image search
+      const searchResponse = await google.search(
+        await fs.readFile(tempFilePath),
+        { ris: true }
+      );
+
+      // Delete the temporary file after search
+      await fs.unlink(tempFilePath);
+
+      // Return the search results
+      return NextResponse.json({
+        results: searchResponse.results.map((result) => result.url),
+      });
+    } catch (searchError) {
+      console.error("Error during reverse image search:", searchError);
+
+      // Cleanup the file even if search fails
+      await fs.unlink(tempFilePath);
+
+      return NextResponse.json(
+        { error: "Reverse image search failed" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error("Error during reverse image search:", error.message);
-    return res
-      .status(500)
-      .json({ error: "Failed to perform reverse image search" });
+    console.error("Error in processing API request:", error);
+
+    return NextResponse.json(
+      { error: "Failed to process the image URL" },
+      { status: 500 }
+    );
   }
 }

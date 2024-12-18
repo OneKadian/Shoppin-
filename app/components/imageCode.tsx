@@ -10,11 +10,14 @@ import { ImageSearchResult } from '../types/image-search';
 import Image from 'next/image';
 import Google from '../../public/Google_2015_logo.svg.png';
 import Link from 'next/link';
+import google from 'googlethis';
+
 
 interface Result {
   src: string;
   link: string;
 }
+
 
 const Images = () => {
   const router = useRouter();
@@ -35,7 +38,6 @@ const Images = () => {
   }>>([]);
   const [isResultsLoading, setIsResultsLoading] = useState(true);
   const [isImageLoading, setIsImageLoading] = useState(true);
-
   useEffect(() => {
     const imageSourceParam = searchParams.get('image');
 
@@ -46,37 +48,36 @@ const Images = () => {
 
     setImageSource(imageSourceParam);
 
-    const fetchReverseImageSearch = async () => {
-      try {
-        setIsResultsLoading(true);
+const fetchReverseImageSearch = async () => {
+  try {
+    setIsResultsLoading(true);
 
-        const response = await fetch('/api/reverse-image-search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: imageSourceParam }),
-        });
+    const response = await fetch('/api/reverse-image-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl: imageSourceParam }),
+    });
 
-        if (!response.ok) {
-          throw new Error(`API responded with status ${response.status}`);
-        }
+    if (!response.ok) {
+      throw new Error(`API responded with status ${response.status}`);
+    }
 
-        const data = await response.json();
-        
-        // Transform the results to match the expected format
-        const transformedResults = data.results.map((src: string, index: number) => ({
-          link: src, // Use the image source as the link
-          src: src,
-          title: `Similar Image ${index + 1}`
-        }));
+    const data = await response.json();
 
-        setResults(transformedResults);
-      } catch (error) {
-        console.error('Error fetching reverse image search results:', error);
-        // Optionally set an error state to show to the user
-      } finally {
-        setIsResultsLoading(false);
-      }
-    };
+    // Transform the results as needed for your UI
+    const transformedResults = data.results.map((src: string, index: number) => ({
+      link: src,
+      src,
+      title: `Similar Image ${index + 1}`,
+    }));
+
+    setResults(transformedResults);
+  } catch (error) {
+    console.error('Error fetching reverse image search results:', error);
+  } finally {
+    setIsResultsLoading(false);
+  }
+};
 
     fetchReverseImageSearch();
   }, [router, searchParams]);
