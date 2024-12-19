@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, Grid, Menu, Camera, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
 import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ImageSearchResult } from '../types/image-search';
@@ -11,11 +12,24 @@ import Image from 'next/image';
 import Google from '../../public/Google_2015_logo.svg.png';
 import Link from 'next/link';
 import google from 'googlethis';
+import { Buffer } from 'buffer';
 
 
-interface Result {
-  src: string;
+interface SearchResult {
+  position: number;
+  title: string;
   link: string;
+  redirect_link: string;
+  displayed_link: string;
+  favicon: string;
+  snippet: string;
+  snippet_highlighted_words: string[];
+  source: string;
+  thumbnail?: string; // Optional since some results may not have thumbnails
+}
+
+interface ResultsState {
+  results: SearchResult[];
 }
 
 
@@ -32,12 +46,11 @@ const Images = () => {
     width: 100,
     height: 100,
   });
-  const [results, setResults] = useState<Array<{
-    link: string;
-    src: string;
-  }>>([]);
+  const [Results, setResults] = useState<ResultsState>({ results: [] });
   const [isResultsLoading, setIsResultsLoading] = useState(true);
   const [isImageLoading, setIsImageLoading] = useState(true);
+
+  // Fetch and process the reverse image search results
   useEffect(() => {
     const imageSourceParam = searchParams.get('image');
 
@@ -48,39 +61,78 @@ const Images = () => {
 
     setImageSource(imageSourceParam);
 
-const fetchReverseImageSearch = async () => {
-  try {
-    setIsResultsLoading(true);
+    const fetchReverseImageSearch = async () => {
+      try {
+        setIsResultsLoading(true);
 
-    const response = await fetch('/api/reverse-image-search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageUrl: imageSourceParam }),
-    });
+        const response = await fetch('/api/reverse-image-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: imageSourceParam }),
+        });
 
-    if (!response.ok) {
-      throw new Error(`API responded with status ${response.status}`);
-    }
+        if (!response.ok) {
+          throw new Error(`API responded with status ${response.status}`);
+        }
 
-    const data = await response.json();
+        const data = await response.json();
 
-    // Transform the results as needed for your UI
-    const transformedResults = data.results.map((src: string, index: number) => ({
-      link: src,
-      src,
-      title: `Similar Image ${index + 1}`,
-    }));
+        // Map API results to match the `SearchResult` interface
+        const transformedResults: SearchResult[] = data.results.map(
+          (result: Partial<SearchResult>, index: number) => ({
+            position: result.position || index + 1,
+            title: result.title || `Similar Image ${index + 1}`,
+            link: result.link || '',
+            redirect_link: result.redirect_link || '',
+            displayed_link: result.displayed_link || '',
+            favicon: result.favicon || '',
+            snippet: result.snippet || '',
+            snippet_highlighted_words: result.snippet_highlighted_words || [],
+            source: result.source || 'Unknown',
+            thumbnail: result.thumbnail,
+          })
+        );
 
-    setResults(transformedResults);
-  } catch (error) {
-    console.error('Error fetching reverse image search results:', error);
-  } finally {
-    setIsResultsLoading(false);
-  }
-};
+        setResults({ results: transformedResults });
+      } catch (error) {
+        console.error('Error fetching reverse image search results:', error);
+      } finally {
+        setIsResultsLoading(false);
+      }
+    };
 
     fetchReverseImageSearch();
   }, [router, searchParams]);
+
+   const handleCardClick = (link: string) => {
+    window.open(link, '_blank');
+  };
+
+
+    const ResultCard = ({ result }: { result: SearchResult }) => (
+    <Card 
+      className="bg-[#303134] border-none cursor-pointer hover:bg-[#3c4043] transition-colors duration-200"
+      onClick={() => handleCardClick(result.link)}
+    >
+      <div className="p-4 space-y-3">
+        <div className="w-full h-40 bg-[#202124] rounded-lg overflow-hidden">
+          <img
+            src={result.thumbnail || result.favicon} 
+            // src={result.thumbnail } 
+            alt={result.title}
+            className="w-full h-full object-contain"
+            // width={100}
+            // height={100}
+          />
+        </div>
+        <h3 className="text-white font-medium line-clamp-2">{result.title}</h3>
+        <p className="text-gray-400 text-sm line-clamp-2">{result.snippet}</p>
+      </div>
+    </Card>
+  );
+
+
+
 
   if (!imageSource) {
     return <p>Loading...</p>;
@@ -186,38 +238,26 @@ const fetchReverseImageSearch = async () => {
 
   {/* Right Half */}
   <div className="w-1/2 flex flex-col bg-white text-black">
-    {isLoading ? (
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mb-4"></div>
-        <p className="text-black">Results are loadin'</p>
-      </div>
-    ) : (
-
-        <div className="flex-1 flex flex-col p-4 space-y-4">
-      {isResultsLoading ? (
-        <p>Searching for similar images...</p>
-      ) : results.length === 0 ? (
-        <p>No similar images found.</p>
+     {isLoading ? (
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mb-4"></div>
+          <p className="text-black">Results are loading...</p>
+        </div>
       ) : (
-        results.map((result, index) => (
-          <a
-            key={index}
-            href={result.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-4"
-          >
-            <img
-              src={result.src}
-              alt={`Result ${index + 1}`}
-              className="w-16 h-16 object-cover"
-            />
-            <p className="text-sm text-gray-700">Similar Image {index + 1}</p>
-          </a>
-        ))
+        <div className="flex-1 flex flex-col p-4 space-y-4">
+          {isResultsLoading ? (
+            <p>Searching for similar images...</p>
+          ) : Results.results.length === 0 ? (
+            <p>No similar images found.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {Results.results.slice(0, 4).map((result, index) => (
+                <ResultCard key={index} result={result} />
+              ))}
+            </div>
+          )}
+        </div>
       )}
-    </div>
-    )}
     {/* Footer */}
     <div className="h-16 border-t border-gray-200 flex items-center justify-center gap-2">
       <div className="flex items-center gap-2 text-sm text-gray-600">

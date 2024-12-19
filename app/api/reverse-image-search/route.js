@@ -1,61 +1,49 @@
-import { google } from "googlethis";
-import fs from "fs/promises";
-import path from "path";
-import { NextResponse } from "next/server";
-import axios from "axios";
+import fetch from "node-fetch";
 
 export async function POST(req) {
   try {
-    const { imageUrl } = await req.json();
+    const body = await req.json();
+    const { imageUrl } = body;
 
     if (!imageUrl) {
-      return NextResponse.json(
-        { error: "Image URL is required" },
-        { status: 400 }
-      );
-    }
-
-    // Fetch the image from the URL
-    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
-    const imageBuffer = Buffer.from(response.data);
-
-    // Define a temporary file path
-    const tempFilePath = path.join(process.cwd(), "temp-image.jpg");
-
-    // Save the image temporarily
-    await fs.writeFile(tempFilePath, imageBuffer);
-
-    try {
-      // Perform reverse image search
-      const searchResponse = await google.search(
-        await fs.readFile(tempFilePath),
-        { ris: true }
-      );
-
-      // Delete the temporary file after search
-      await fs.unlink(tempFilePath);
-
-      // Return the search results
-      return NextResponse.json({
-        results: searchResponse.results.map((result) => result.url),
+      return new Response(JSON.stringify({ error: "Image URL is required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
       });
-    } catch (searchError) {
-      console.error("Error during reverse image search:", searchError);
+    }
 
-      // Cleanup the file even if search fails
-      await fs.unlink(tempFilePath);
+    const serpApiKey = process.env.NEXT_PUBLIC_SERP_API_KEY;
 
-      return NextResponse.json(
-        { error: "Reverse image search failed" },
-        { status: 500 }
+    if (!serpApiKey) {
+      throw new Error(
+        "SerpApi key is not configured in the environment variables."
       );
     }
-  } catch (error) {
-    console.error("Error in processing API request:", error);
 
-    return NextResponse.json(
-      { error: "Failed to process the image URL" },
-      { status: 500 }
+    const apiUrl = `https://serpapi.com/search?engine=google_reverse_image&image_url=${encodeURIComponent(
+      imageUrl
+    )}&api_key=${serpApiKey}`;
+
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`SerpApi responded with status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Extract relevant results
+    const results = data.image_results || [];
+
+    return new Response(JSON.stringify({ results }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error during reverse image search:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to perform reverse image search" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }

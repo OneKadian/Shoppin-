@@ -14,12 +14,18 @@ const Index = () => {
       <Header />
       
       <main className="flex-1 flex flex-col items-center justify-center -mt-32">
-        <div className="c"></div>
+
+        <div className="h-max w-max mb-12 flex justify-center flex-col">
+          <div className='flex justify-center'>
         <img
           src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
           alt="Google"
-          className="w-[272px] h-[92px] mb-8"
+          className="w-[272px] h-[92px] mb-4"
+          // className="w-[272px] h-[92px] mb-8"
+
         />
+          </div>
+
         
         <SearchBar onCameraClick={() => setIsImageModalOpen(true)} />
         <LanguageOptions />
@@ -28,6 +34,7 @@ const Index = () => {
           isOpen={isImageModalOpen}
           onClose={() => setIsImageModalOpen(false)}
         />
+        </div>
       </main>
       
       <Footer />
