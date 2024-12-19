@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/api/**/*.js" // Updated to include all API files
-  ],
+, "app/components/Header.jsx"  ],
   "exclude": [
     "node_modules"
   ]

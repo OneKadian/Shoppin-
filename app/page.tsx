@@ -15,7 +15,7 @@ const Index = () => {
       
       <main className="flex-1 flex flex-col items-center justify-center -mt-32">
 
-        <div className="h-max w-max mb-12 flex justify-center flex-col">
+        <div className="h-max w-max mb-12 flex justify-center fixed flex-col">
           <div className='flex justify-center'>
         <img
           src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
