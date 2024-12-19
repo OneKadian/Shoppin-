@@ -241,7 +241,7 @@ const Images = () => {
      {isLoading ? (
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mb-4"></div>
-          <p className="text-black">Results are loadin'...</p>
+          <p className="text-black">Rizzults are loadin'...</p>
         </div>
       ) : (
         <div className="flex-1 flex flex-col p-4 space-y-4">
