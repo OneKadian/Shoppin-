@@ -3,6 +3,7 @@ import { Beaker } from "lucide-react";
 import { Avatar } from "./ui/avatar";
 import { HiBeaker } from "react-icons/hi";
 import { CgMenuGridO } from "react-icons/cg";
+import Link from "next/link";
 
 const Header = () => {
   return (
@@ -31,9 +32,16 @@ const Header = () => {
         <button className="w-10 h-10 flex items-center justify-center hover:bg-gray-700 rounded-full">
           <CgMenuGridO className="w-6 h-6 text-gray-300" />
         </button>
-        <button className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm">
-          A
-        </button>
+        <Link
+          className="cursor-pointer"
+          href="https://maple-cheese-7fb.notion.site/So-you-re-just-a-chill-guy-who-clicked-1626e8906fa58042a7bed685f12e7de1?pvs=4"
+        >
+          <button className="w-8 h-8 cursor-pointer rounded-full bg-blue-500 text-white flex items-center justify-center text-sm">
+            <a href="https://maple-cheese-7fb.notion.site/So-you-re-just-a-chill-guy-who-clicked-1626e8906fa58042a7bed685f12e7de1?pvs=4">
+              A
+            </a>
+          </button>
+        </Link>
       </div>
     </header>
   );

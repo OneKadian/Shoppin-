@@ -341,7 +341,7 @@ return (
   <div className="relative">
     <div
       ref={dropdownRef}
-      className="absolute top-full w-[95%] bg-[#2f3133] shadow-lg rounded-b-lg border-t border-gray-700 overflow-hidden z-50"
+      className="absolute top-full w-[100%] bg-[#2f3133] shadow-lg rounded-b-lg border-t border-gray-700 overflow-hidden z-50"
     >
       <div className="py-2">
         {suggestions.map((suggestion, index) => (

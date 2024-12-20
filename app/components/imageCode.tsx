@@ -171,7 +171,10 @@ const Images = () => {
               <Grid className="w-5 h-5 text-gray-600" />
             </Button>
             <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white cursor-pointer">
+              <Link href="https://maple-cheese-7fb.notion.site/So-you-re-just-a-chill-guy-who-clicked-1626e8906fa58042a7bed685f12e7de1">
               A
+              
+              </Link>
             </div>
           </div>
         </div>
