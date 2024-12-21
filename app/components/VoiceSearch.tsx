@@ -126,7 +126,7 @@ const VoiceSearch = ({ isOpen, onClose }: VoiceSearchProps) => {
                 }}
               />
             )}
-            <motion.div
+            {/* <motion.div
               className={`absolute z-10 w-32 h-32 rounded-full flex items-center justify-center ${
                 showInitialState ? 'bg-white' : 'bg-red-500'
               }`}
@@ -139,7 +139,20 @@ const VoiceSearch = ({ isOpen, onClose }: VoiceSearchProps) => {
               <Mic 
                 className={`w-16 h-16 ${showInitialState ? 'text-red-500' : 'text-white'}`} 
               />
-            </motion.div>
+            </motion.div> */}
+            <motion.div
+  className={`relative z-10 w-32 h-32 rounded-full flex items-center justify-center ${
+    showInitialState ? 'bg-white' : 'bg-red-500'
+  }`}
+>
+  <span
+    className={`material-symbols-outlined text-6xl ${
+      showInitialState ? 'text-red-500' : 'text-white'
+    }`}
+  >
+    mic
+  </span>
+</motion.div>
           </div>
         </div>
       </div>

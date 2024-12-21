@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @layer base {
   body {
@@ -187,4 +189,10 @@
   /* -webkit-line-clamp: 2; */
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.border-dashed {
+  border-style: dashed;
+  border-width: 2px;
+  border-spacing: 2px;
 }
