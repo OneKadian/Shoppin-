@@ -135,7 +135,7 @@ const ImageSearchModal = ({ isOpen, onClose }: ImageSearchModalProps) => {
 //     </div>
 //   </div>
 <div className="fixed left-1/2 transform -translate-x-1/2 top-[225px] w-[584px] z-40">
-  <div className="bg-[#303134] rounded-xl mt-[100px] p-4">
+  <div className="bg-[#303134] rounded-2xl mt-[100px] p-4">
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-white text-[16px] font-semibold flex-1 text-center">
         Search any image with Google Lens
