@@ -10,3 +10,4 @@ export interface ImageSearchError {
   message: string;
   code: string;
 }
+

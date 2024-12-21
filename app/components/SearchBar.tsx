@@ -1,10 +1,11 @@
 'use client'
 import React, {useState, useEffect, useRef} from 'react';
-import { Search , TrendingUp,  ArrowUp} from 'lucide-react';
+import { Search , TrendingUp,  ArrowUp, Mic } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
-import Mic from "../../public/mic.png"
+import Mica from "../../public/mic.png"
 import Lens from "../../public/lens.png"
 import Image from 'next/image';
+import VoiceSearch from './VoiceSearch';
 
 
 interface SearchBarProps {
@@ -31,6 +32,7 @@ const trendingSearches: SearchItem[] = [
 
 const SearchBar = ({ onCameraClick }: SearchBarProps) => {
   const [query, setQuery] = useState('');
+    const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -281,8 +283,10 @@ return (
             aria-label="Search"
           />
           <div className="flex items-center gap-1">
-            <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={() => {}}>
-              <Image src={Mic} width={30} height={30} alt="Microphone" />
+            <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center"
+            onClick={() => setIsVoiceSearchOpen(true)}
+            >
+              <Image src={Mica} width={30} height={30} alt="Microphone" />
             </button>
             <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={onCameraClick}>
               <Image src={Lens} width={30} height={30} alt="Lens" />
@@ -295,6 +299,11 @@ return (
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
+
+        <VoiceSearch 
+        isOpen={isVoiceSearchOpen}
+        onClose={() => setIsVoiceSearchOpen(false)}
+      />
 
   {/* {showSuggestions && suggestions.length > 0 && (
     <div className="flex justify-center rounded-t-lg">
