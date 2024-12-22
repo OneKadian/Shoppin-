@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, Grid, Menu, Camera, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -13,6 +13,8 @@ import Google from '../../public/Google_2015_logo.svg.png';
 import Link from 'next/link';
 import google from 'googlethis';
 import { Buffer } from 'buffer';
+import StarryAnimation from './starryAnimation'
+
 
 
 interface SearchResult {
@@ -34,6 +36,8 @@ interface ResultsState {
 
 
 const Images = () => {
+    const starsRef = useRef<HTMLDivElement>(null);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +53,38 @@ const Images = () => {
   const [Results, setResults] = useState<ResultsState>({ results: [] });
   const [isResultsLoading, setIsResultsLoading] = useState(true);
   const [isImageLoading, setIsImageLoading] = useState(true);
+
+
+    const createStars = (container: HTMLDivElement, count: number) => {
+    container.innerHTML = ''; // Clear previous stars
+    for (let i = 0; i < count; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.left = `${Math.random() * 100}%`;
+      container.appendChild(star);
+    }
+    animateStars();
+  };
+
+  const animateStars = () => {
+    const stars = starsRef.current?.querySelectorAll('.star');
+    stars?.forEach((star) => {
+      const duration = Math.random() * 0.5 + 0.5; // Random duration between 0.5s and 1s
+      star.animate(
+        [
+          { opacity: 0.2 },
+          { opacity: 1 },
+          { opacity: Math.random() },
+        ],
+        {
+          duration: duration * 1000,
+          iterations: Infinity,
+        }
+      );
+    });
+  };
+
 
   // Fetch and process the reverse image search results
   useEffect(() => {
@@ -102,7 +138,11 @@ const Images = () => {
     };
 
     fetchReverseImageSearch();
-  }, [router, searchParams]);
+
+        if (isImageLoading && starsRef.current) {
+      createStars(starsRef.current, 200);
+    }
+  }, [router, searchParams, isLoading]);
 
    const handleCardClick = (link: string) => {
     window.open(link, '_blank');
@@ -130,9 +170,6 @@ const Images = () => {
       </div>
     </Card>
   );
-
-
-
 
   if (!imageSource) {
     return <p>Loading...</p>;
@@ -195,7 +232,7 @@ const Images = () => {
             </Button>
 
             {/* Uploaded Image or Spinner */}
-            <div className="relative w-full h-full flex items-center justify-center">
+            {/* <div className="relative w-full h-full flex items-center justify-center">
               {isImageLoading && (
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4"></div>
               )}
@@ -213,7 +250,38 @@ const Images = () => {
                   onLoad={() => setIsImageLoading(false)}
                 />
               </ReactCrop>
-            </div>
+            </div> */}
+
+ <div className="relative w-full h-full flex items-center justify-center">
+      {/* Starry Animation Overlay */}
+      {isLoading && (
+        <div
+          ref={starsRef}
+          className="absolute inset-0 z-10 pointer-events-none"
+        ></div>
+      )}
+
+      {/* Image Cropper or Spinner */}
+      <div className="relative w-full h-full flex items-center justify-center">
+        {isLoading && (
+          <div className="absolute animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4 z-20"></div>
+        )}
+        <ReactCrop
+          crop={crop}
+          onChange={(c) => setCrop(c)}
+          className={`max-h-[80%] max-w-[90%] ${
+            isLoading ? 'hidden' : 'block'
+          }`}
+        >
+          <img
+            src={imageSource}
+            alt="Uploaded"
+            className={`max-w-[90%] max-h-[80%] object-contain `}
+            onLoad={() => setIsLoading(false)}
+          />
+        </ReactCrop>
+      </div>
+    </div>
 
             {/* Action buttons */}
             <div className="action-buttons-group flex items-center">

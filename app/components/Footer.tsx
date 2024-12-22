@@ -1,8 +1,12 @@
 import React from 'react';
 
-const Footer = () => {
+interface FooterProps {
+  className?: string;
+}
+
+const Footer = ({ className }: FooterProps) => {
   return (
-    <footer className="fixed bottom-0 w-full bg-[#171717] text-sm">
+    <footer className={`fixed bottom-0 w-full bg-[#171717] text-sm ${className}`}>
       <div className="px-6 py-3 border-b border-gray-700">
         <span className="text-white">India</span>
       </div>
