@@ -109,7 +109,7 @@
 }
 
 .action-button {
-  @apply px-6 py-2 rounded-full transition-all duration-200;
+  @apply px-6 py-2 transition-all duration-200;
 }
 
 .action-button.active {
@@ -121,11 +121,17 @@
 }
 
 .action-buttons-group {
-  @apply flex overflow-hidden rounded-full bg-[#303134];
+  @apply flex overflow-hidden bg-[#303134];
 }
 
 .action-buttons-group .action-button {
-  @apply rounded-none first:rounded-l-full last:rounded-r-full;
+  @apply rounded-full;
+  /* Ensure all buttons have rounded edges */
+}
+
+.action-buttons-group .action-button:not(:first-child):not(:last-child) {
+  @apply mx-[-1px];
+  /* Overlap to maintain consistent borders between buttons */
 }
 
 #root {

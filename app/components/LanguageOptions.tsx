@@ -2,8 +2,8 @@ import React from 'react';
 
 const LanguageOptions = () => {
   return (
-    <div className="text-center mt-8 text-sm">
-      <div className='w-full'>
+    <div className="text-center mt-8 text-sm flex justify-center">
+      <div className='w-[90%] lg:w-full '>
       <span className="text-gray-400 mr-2 text-xs">Google offered in:</span>
       {['हिन्दी', 'বাংলা', 'తెలుగు', 'मराठी', 'தமிழ்', 'ગુજરાતી', 'ಕನ್ನಡ', 'മലയാളം', 'ਪੰਜਾਬੀ'].map(
         (lang, index) => (

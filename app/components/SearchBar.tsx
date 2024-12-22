@@ -140,7 +140,7 @@ const SearchBar = ({ onCameraClick }: SearchBarProps) => {
   };
 
   return (
-<div className="w-full max-w-[585px] mx-auto relative">
+<div className="w-[80%] mx-auto lg:w-full lg:max-w-[585px] relative">
   <div
     ref={containerRef}
     className={`relative bg-[#303134] ${
@@ -156,72 +156,72 @@ const SearchBar = ({ onCameraClick }: SearchBarProps) => {
         type="text"
         className="bg-transparent flex-1 outline-none text-white text-base"
         value={query}
-                onChange={handleInputChange}
+        onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         aria-label="Search"
       />
-          <div className="flex items-center gap-1">
-            <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center"
-            onClick={() => setIsVoiceSearchOpen(true)}
-            >
-              <Image src={Mica} width={30} height={30} alt="Microphone" />
-            </button>
-            <button className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" onClick={onCameraClick}>
-              <Image src={Lens} width={30} height={30} alt="Lens" />
-            </button>
-          </div>
+      <div className="flex items-center gap-1">
+        <button 
+          className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center"
+          onClick={() => setIsVoiceSearchOpen(true)}
+        >
+          <Image src={Mica} width={30} height={30} alt="Microphone" />
+        </button>
+        <button 
+          className="hover:bg-gray-700 rounded-full h-[30px] flex items-center justify-center" 
+          onClick={onCameraClick}
+        >
+          <Image src={Lens} width={30} height={30} alt="Lens" />
+        </button>
+      </div>
     </div>
 
     <VoiceSearch 
-          isOpen={isVoiceSearchOpen}
-          onClose={() => setIsVoiceSearchOpen(false)}
-        />
-
+      isOpen={isVoiceSearchOpen}
+      onClose={() => setIsVoiceSearchOpen(false)}
+    />
 
     {showSuggestions && suggestions.length > 0 && (
       <div
         className="absolute left-0 right-0 bg-[#303134] rounded-b-xl border-t border-gray-700 z-10"
         style={{ top: '100%' }}
       >
-        <div className="p-4 rounded-xl w-[585px]">
+        <div className="p-4 rounded-xl w-full lg:w-[585px]">
           <h2 className="text-sm mb-3 text-gray-400">Trending searches</h2>
 
-
-                {/* Suggestions Box */}
-      {suggestions.length > 0 && (
-          <div className="space-y-3">
-            {suggestions.map((item, index) => (
-              <div
-                key={index}
-                className={`flex items-center gap-2 hover:bg-[#333333] p-1 rounded-lg cursor-pointer transition-colors duration-200 ${
-                  index === selectedIndex ? "bg-[#333333]" : ""
-                }`}
-                onClick={() => handleSuggestionClick(item.text)}
-                onMouseEnter={() => setSelectedIndex(index)}
-              >
+          {/* Suggestions Box */}
+          {suggestions.length > 0 && (
+            <div className="space-y-3">
+              {suggestions.map((item, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-2 hover:bg-[#333333] p-1 rounded-lg cursor-pointer transition-colors duration-200 ${
+                    index === selectedIndex ? "bg-[#333333]" : ""
+                  }`}
+                  onClick={() => handleSuggestionClick(item.text)}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                >
                   <TrendingUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-sm text-gray-200">{item.text}</span>
-              </div>
-            ))}
+                  <span className="text-sm text-gray-200 break-words">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-2 mt-6 justify-center">
+            <button 
+              onClick={handleSearch}
+              className="px-4 py-2 bg-[#444444] rounded text-sm transition-colors duration-200 text-gray-200"
+            >
+              Google Search
+            </button>
+            <button 
+              onClick={handleFeelingLucky}
+              className="px-4 py-2 bg-[#444444] rounded text-sm transition-colors duration-200 text-gray-200"
+            >
+              I'm Feeling Lucky
+            </button>
           </div>
-      )}
-
-
-        <div className="flex gap-2 mt-6 justify-center">
-          <button 
-            onClick={handleSearch}
-            className="px-4 py-2 bg-[#444444] rounded text-sm transition-colors duration-200 text-gray-200"
-          >
-            Google Search
-          </button>
-          <button 
-            onClick={handleFeelingLucky}
-            className="px-4 py-2 bg-[#444444] rounded text-sm transition-colors duration-200 text-gray-200"
-          >
-            I'm Feeling Lucky
-          </button>
-        </div>
-
 
           <div className="text-right mt-2">
             <span className="text-xs text-gray-500 italic">
@@ -233,7 +233,7 @@ const SearchBar = ({ onCameraClick }: SearchBarProps) => {
     )}
   </div>
 
- {!showSuggestions && (
+  {!showSuggestions && (
     <div className="flex justify-center space-x-3 mt-8">
       <button 
         onClick={handleSearch}
