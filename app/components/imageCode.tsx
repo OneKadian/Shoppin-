@@ -12,6 +12,7 @@ import Image from 'next/image';
 import Google from '../../public/Google_2015_logo.svg.png';
 import Link from 'next/link';
 import { gsap } from 'gsap';
+import { CgMenuGridO } from "react-icons/cg";
 
 interface SearchResult {
   position: number;
@@ -204,7 +205,8 @@ useEffect(() => {
               size="icon"
               className="hover:bg-gray-100"
             >
-              <Grid className="w-5 h-5 text-gray-600" />
+              <Grid className="w-5 h-5 text-gray-800" />
+              {/* <CgMenuGridO className="w-6 h-6 text-gray-800" /> */}
             </Button>
             <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white cursor-pointer">
               <Link href="https://maple-cheese-7fb.notion.site/So-you-re-just-a-chill-guy-who-clicked-1626e8906fa58042a7bed685f12e7de1">
