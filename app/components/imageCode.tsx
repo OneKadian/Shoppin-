@@ -11,11 +11,7 @@ import { ImageSearchResult } from '../types/image-search';
 import Image from 'next/image';
 import Google from '../../public/Google_2015_logo.svg.png';
 import Link from 'next/link';
-import google from 'googlethis';
-import { Buffer } from 'buffer';
-import StarryAnimation from './starryAnimation'
-
-
+import { gsap } from 'gsap';
 
 interface SearchResult {
   position: number;
@@ -36,9 +32,8 @@ interface ResultsState {
 
 
 const Images = () => {
-    const starsRef = useRef<HTMLDivElement>(null);
-
   const router = useRouter();
+    const starsContainerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [imageSource, setImageSource] = useState<string>('');
@@ -54,95 +49,99 @@ const Images = () => {
   const [isResultsLoading, setIsResultsLoading] = useState(true);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
-
-    const createStars = (container: HTMLDivElement, count: number) => {
-    container.innerHTML = ''; // Clear previous stars
-    for (let i = 0; i < count; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.left = `${Math.random() * 100}%`;
-      container.appendChild(star);
-    }
-    animateStars();
+   const createStar = () => {
+    if (!starsContainerRef.current) return;
+    
+    const star = document.createElement('figure');
+    star.className = 'star absolute w-[1px] h-[1px] rounded-full bg-white';
+    star.style.boxShadow = '0px 0px 1px 1px rgba(255, 255, 255, 0.4)';
+    star.style.top = `${100 * Math.random()}%`;
+    star.style.left = `${100 * Math.random()}%`;
+    starsContainerRef.current.appendChild(star);
+    return star;
   };
-
-  const animateStars = () => {
-    const stars = starsRef.current?.querySelectorAll('.star');
-    stars?.forEach((star) => {
-      const duration = Math.random() * 0.5 + 0.5; // Random duration between 0.5s and 1s
-      star.animate(
-        [
-          { opacity: 0.2 },
-          { opacity: 1 },
-          { opacity: Math.random() },
-        ],
-        {
-          duration: duration * 1000,
-          iterations: Infinity,
-        }
-      );
+  const createStars = (count: number) => {
+    const stars = [];
+    for (let i = 0; i < count; i++) {
+      const star = createStar();
+      if (star) stars.push(star);
+    }
+    return stars;
+  };
+  const animateStars = (stars: HTMLElement[]) => {
+    stars.forEach((star) => {
+      gsap.to(star, {
+        opacity: Math.random(),
+        duration: Math.random() * 0.5 + 0.5,
+        onComplete: () => animateStars([star])
+      });
     });
   };
-
-
   // Fetch and process the reverse image search results
-  useEffect(() => {
-    const imageSourceParam = searchParams.get('image');
+useEffect(() => {
+  const imageSourceParam = searchParams.get('image');
 
-    if (!imageSourceParam) {
-      router.push('/');
-      return;
-    }
+  if (!imageSourceParam) {
+    router.push('/');
+    return;
+  }
 
-    setImageSource(imageSourceParam);
+  setImageSource(imageSourceParam);
 
-    const fetchReverseImageSearch = async () => {
-      try {
-        setIsResultsLoading(true);
+  // Stars will now be created in the image onLoad callback instead of here
+  // This ensures they appear after the image is loaded
 
-        const response = await fetch('/api/reverse-image-search', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: imageSourceParam }),
-        });
+  const fetchReverseImageSearch = async () => {
+    try {
+      setIsResultsLoading(true);
 
-        if (!response.ok) {
-          throw new Error(`API responded with status ${response.status}`);
-        }
+      const response = await fetch('/api/reverse-image-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: imageSourceParam }),
+      });
 
-        const data = await response.json();
-
-        // Map API results to match the `SearchResult` interface
-        const transformedResults: SearchResult[] = data.results.map(
-          (result: Partial<SearchResult>, index: number) => ({
-            position: result.position || index + 1,
-            title: result.title || `Similar Image ${index + 1}`,
-            link: result.link || '',
-            redirect_link: result.redirect_link || '',
-            displayed_link: result.displayed_link || '',
-            favicon: result.favicon || '',
-            snippet: result.snippet || '',
-            snippet_highlighted_words: result.snippet_highlighted_words || [],
-            source: result.source || 'Unknown',
-            thumbnail: result.thumbnail,
-          })
-        );
-
-        setResults({ results: transformedResults });
-      } catch (error) {
-        console.error('Error fetching reverse image search results:', error);
-      } finally {
-        setIsResultsLoading(false);
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
       }
-    };
 
-    fetchReverseImageSearch();
+      const data = await response.json();
 
-        if (isImageLoading && starsRef.current) {
-      createStars(starsRef.current, 200);
+      // Map API results to match the `SearchResult` interface
+      const transformedResults: SearchResult[] = data.results.map(
+        (result: Partial<SearchResult>, index: number) => ({
+          position: result.position || index + 1,
+          title: result.title || `Similar Image ${index + 1}`,
+          link: result.link || '',
+          redirect_link: result.redirect_link || '',
+          displayed_link: result.displayed_link || '',
+          favicon: result.favicon || '',
+          snippet: result.snippet || '',
+          snippet_highlighted_words: result.snippet_highlighted_words || [],
+          source: result.source || 'Unknown',
+          thumbnail: result.thumbnail,
+        })
+      );
+
+      setResults({ results: transformedResults });
+    } catch (error) {
+      console.error('Error fetching reverse image search results:', error);
+    } finally {
+      setIsResultsLoading(false);
+      // Don't remove stars here anymore as we want them to persist
     }
-  }, [router, searchParams, isLoading]);
+  };
+
+  fetchReverseImageSearch();
+
+  // Cleanup: Clear all stars on unmount using innerHTML for better cleanup
+  return () => {
+    if (starsContainerRef.current) {
+      starsContainerRef.current.innerHTML = '';
+    }
+  };
+}, [router, searchParams]);
+
 
    const handleCardClick = (link: string) => {
     window.open(link, '_blank');
@@ -231,57 +230,45 @@ const Images = () => {
               Find image source
             </Button>
 
-            {/* Uploaded Image or Spinner */}
-            {/* <div className="relative w-full h-full flex items-center justify-center">
-              {isImageLoading && (
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4"></div>
-              )}
-              <ReactCrop
-                crop={crop}
-                onChange={(c) => setCrop(c)}
-                className={`max-h-[80%] max-w-[90%] ${
-                    isImageLoading ? 'hidden' : 'block'
-                  }`}
-              >
-                <img
-                  src={imageSource}
-                  alt="Uploaded"
-                  className={`max-w-[90%] max-h-[80%] object-contain `}
-                  onLoad={() => setIsImageLoading(false)}
-                />
-              </ReactCrop>
-            </div> */}
+            {/* Original cropper */}
+<div className="relative w-full h-full flex items-center justify-center">
+  {/* Stars container */}
 
- <div className="relative w-full h-full flex items-center justify-center">
-      {/* Starry Animation Overlay */}
-      {isLoading && (
+
+  {/* Loading spinner */}
+  {isImageLoading && (
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
+  )}
+
+  <ReactCrop
+    crop={crop}
+    onChange={(c) => setCrop(c)}
+    className={`max-h-[80%] max-w-[90%] ${
+      isImageLoading ? 'hidden' : 'block'
+    }`}
+  >
+      {isResultsLoading && (
         <div
-          ref={starsRef}
-          className="absolute inset-0 z-10 pointer-events-none"
-        ></div>
+          ref={starsContainerRef}
+          className="absolute inset-0 pointer-events-none z-10"
+        />
       )}
+    <img
+      src={imageSource}
+      alt="Uploaded"
+      className="max-w-[90%] max-h-[80%] object-contain"
+      onLoad={() => {
+        setIsImageLoading(false);
+        // Create and animate stars after image loads
+        if (starsContainerRef.current) {
+          const stars = createStars(200);
+          animateStars(stars);
+        }
+      }}
+    />
+  </ReactCrop>
+</div>
 
-      {/* Image Cropper or Spinner */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        {isLoading && (
-          <div className="absolute animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4 z-20"></div>
-        )}
-        <ReactCrop
-          crop={crop}
-          onChange={(c) => setCrop(c)}
-          className={`max-h-[80%] max-w-[90%] ${
-            isLoading ? 'hidden' : 'block'
-          }`}
-        >
-          <img
-            src={imageSource}
-            alt="Uploaded"
-            className={`max-w-[90%] max-h-[80%] object-contain `}
-            onLoad={() => setIsLoading(false)}
-          />
-        </ReactCrop>
-      </div>
-    </div>
 
             {/* Action buttons */}
             <div className="action-buttons-group flex items-center">
