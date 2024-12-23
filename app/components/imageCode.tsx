@@ -228,14 +228,14 @@ useEffect(() => {
       {/* Find image source button */}
       <Button
         variant="outline"
-        className="absolute hidden lg:flex top-0 left-1/2 -translate-x-1/2 rounded-full bg-[#303134] hover:bg-[#303134]/80 border-none"
+        className="absolute border border-gray-300 lg:flex top-0 left-1/2 -translate-x-1/2 rounded-full bg-[#303134] hover:bg-[#303134]/80 border-none"
       >
         <Search className="w-4 h-4 mr-2" />
         Find image source
       </Button>
 
       {/* Original cropper */}
- <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
+ {/* <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
   {isImageLoading && (
     <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
   )}
@@ -265,18 +265,16 @@ useEffect(() => {
       }}
     />
   </ReactCrop>
-</div>
+</div> */}
 
-      {/* <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
+{/* <div className="relative w-full flex items-center justify-center mt-8 lg:mt-1">
   {isImageLoading && (
     <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
   )}
   <ReactCrop
     crop={crop}
     onChange={(c) => setCrop(c)}
-    className={`max-h-[80%] max-w-[90%] ${
-      isImageLoading ? "hidden" : "block"
-    }`}
+    className={`${isImageLoading ? "hidden" : "block"}`}
   >
     {isResultsLoading && (
       <div
@@ -287,7 +285,7 @@ useEffect(() => {
     <img
       src={imageSource}
       alt="Uploaded"
-      className="max-w-[90%] max-h-[80%] object-contain sm:max-w-[80vw] sm:max-h-[60vh]"
+      className="max-w-[90vw] max-h-[60vh] md:max-h-[70vh] lg:max-h-[80vh] w-auto h-auto object-contain mx-auto"
       onLoad={() => {
         setIsImageLoading(false);
         if (starsContainerRef.current) {
@@ -299,6 +297,69 @@ useEffect(() => {
   </ReactCrop>
 </div> */}
 
+{/* <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
+  {isImageLoading && (
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
+  )}
+  <ReactCrop
+    crop={crop}
+    onChange={(c) => setCrop(c)}
+    className={`w-full h-full ${isImageLoading ? "hidden" : "block"} flex justify-center items-center overflow-hidden`}
+  >
+    {isResultsLoading && (
+      <div
+        ref={starsContainerRef}
+        className="absolute inset-0 pointer-events-none z-10"
+      />
+    )}
+    <div className="flex justify-center items-center w-full h-full">
+      <img
+        src={imageSource}
+        alt="Uploaded"
+        className="max-w-[90%] max-h-[80vh] lg:max-w-[60%] lg:max-h-[70vh] object-contain"
+        onLoad={() => {
+          setIsImageLoading(false);
+          if (starsContainerRef.current) {
+            const stars = createStars(200);
+            animateStars(stars);
+          }
+        }}
+      />
+    </div>
+  </ReactCrop>
+</div> */}
+
+<div className="relative w-full flex items-center justify-center mt-8 lg:mt-1">
+  {isImageLoading && (
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
+  )}
+  <ReactCrop
+    crop={crop}
+    onChange={(c) => setCrop(c)}
+    className={`w-full h-full ${isImageLoading ? "hidden" : "block"} flex justify-center items-center overflow-hidden`}
+  >
+    {isResultsLoading && (
+      <div
+        ref={starsContainerRef}
+        className="absolute inset-0 pointer-events-none z-10"
+      />
+    )}
+    <div className="flex justify-center items-center w-full h-full">
+      <img
+        src={imageSource}
+        alt="Uploaded"
+        className="max-w-[90%] max-h-[80vh] lg:max-w-[60%] lg:max-h-[70vh] object-contain"
+        onLoad={() => {
+          setIsImageLoading(false);
+          if (starsContainerRef.current) {
+            const stars = createStars(200);
+            animateStars(stars);
+          }
+        }}
+      />
+    </div>
+  </ReactCrop>
+</div>
 
       {/* Action buttons */}
       <div className="action-buttons-group flex items-center rounded-xl" >
@@ -341,7 +402,7 @@ useEffect(() => {
       <div className="flex-1 flex flex-col p-4 space-y-4 overflow-y-scroll">
         {isResultsLoading ? (
           <p>Rizzults are loadin'... 🍓</p>
-        ) : Results.results.length === 0 && retryCount >= 2 ? (
+        ) : Results.results.length === 0 && retryCount >= 3 ? (
           <p>Almost there, Hold on! 🍓</p>
         ) : (
           <div className="grid grid-cols-2 gap-4">
