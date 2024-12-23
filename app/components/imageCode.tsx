@@ -36,19 +36,20 @@ const Images = () => {
   const router = useRouter();
     const starsContainerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageSource, setImageSource] = useState<string>('');
-  const [activeButton, setActiveButton] = useState<'search' | 'text' | 'translate'>('search');
-  const [crop, setCrop] = useState<Crop>({
-    unit: '%',
-    x: 0,
-    y: 0,
-    width: 100,
-    height: 100,
-  });
-  const [Results, setResults] = useState<ResultsState>({ results: [] });
-  const [isResultsLoading, setIsResultsLoading] = useState(true);
-  const [isImageLoading, setIsImageLoading] = useState(true);
+const [isLoading, setIsLoading] = useState(false);
+const [imageSource, setImageSource] = useState<string>('');
+const [retryCount, setRetryCount] = useState(0); // NEW
+const [activeButton, setActiveButton] = useState<'search' | 'text' | 'translate'>('search');
+const [crop, setCrop] = useState<Crop>({
+  unit: '%',
+  x: 0,
+  y: 0,
+  width: 100,
+  height: 100,
+});
+const [Results, setResults] = useState<ResultsState>({ results: [] });
+const [isResultsLoading, setIsResultsLoading] = useState(true);
+const [isImageLoading, setIsImageLoading] = useState(true);
 
    const createStar = () => {
     if (!starsContainerRef.current) return;
@@ -89,9 +90,6 @@ useEffect(() => {
 
   setImageSource(imageSourceParam);
 
-  // Stars will now be created in the image onLoad callback instead of here
-  // This ensures they appear after the image is loaded
-
   const fetchReverseImageSearch = async () => {
     try {
       setIsResultsLoading(true);
@@ -108,7 +106,6 @@ useEffect(() => {
 
       const data = await response.json();
 
-      // Map API results to match the `SearchResult` interface
       const transformedResults: SearchResult[] = data.results.map(
         (result: Partial<SearchResult>, index: number) => ({
           position: result.position || index + 1,
@@ -129,19 +126,24 @@ useEffect(() => {
       console.error('Error fetching reverse image search results:', error);
     } finally {
       setIsResultsLoading(false);
-      // Don't remove stars here anymore as we want them to persist
     }
   };
 
   fetchReverseImageSearch();
 
-  // Cleanup: Clear all stars on unmount using innerHTML for better cleanup
   return () => {
     if (starsContainerRef.current) {
       starsContainerRef.current.innerHTML = '';
     }
   };
 }, [router, searchParams]);
+
+useEffect(() => {
+  if (!isResultsLoading && Results.results.length === 0 && retryCount < 2) {
+    setRetryCount((prev) => prev + 1);
+    location.reload(); // Refresh the page
+  }
+}, [isResultsLoading, Results.results, retryCount]);
 
 
    const handleCardClick = (link: string) => {
@@ -226,44 +228,77 @@ useEffect(() => {
       {/* Find image source button */}
       <Button
         variant="outline"
-        className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full bg-[#303134] hover:bg-[#303134]/80 border-none"
+        className="absolute hidden lg:flex top-0 left-1/2 -translate-x-1/2 rounded-full bg-[#303134] hover:bg-[#303134]/80 border-none"
       >
         <Search className="w-4 h-4 mr-2" />
         Find image source
       </Button>
 
       {/* Original cropper */}
-      <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
-        {isImageLoading && (
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
-        )}
-        <ReactCrop
-          crop={crop}
-          onChange={(c) => setCrop(c)}
-          className={`max-h-[80%] max-w-[90%] ${
-            isImageLoading ? "hidden" : "block"
-          }`}
-        >
-          {isResultsLoading && (
-            <div
-              ref={starsContainerRef}
-              className="absolute inset-0 pointer-events-none z-10"
-            />
-          )}
-          <img
-            src={imageSource}
-            alt="Uploaded"
-            className="max-w-[90%] max-h-[80%] object-contain"
-            onLoad={() => {
-              setIsImageLoading(false);
-              if (starsContainerRef.current) {
-                const stars = createStars(200);
-                animateStars(stars);
-              }
-            }}
-          />
-        </ReactCrop>
-      </div>
+ <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
+  {isImageLoading && (
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
+  )}
+  <ReactCrop
+    crop={crop}
+    onChange={(c) => setCrop(c)}
+    className={`max-h-[80%] max-w-[90%] ${
+      isImageLoading ? "hidden" : "block"
+    }`}
+  >
+    {isResultsLoading && (
+      <div
+        ref={starsContainerRef}
+        className="absolute inset-0 pointer-events-none z-10"
+      />
+    )}
+    <img
+      src={imageSource}
+      alt="Uploaded"
+      className="max-w-[90%] max-h-[50%] lg:max-h-[70%] sm:max-w-[80vw] sm:max-h-[50vh] object-contain"
+      onLoad={() => {
+        setIsImageLoading(false);
+        if (starsContainerRef.current) {
+          const stars = createStars(200);
+          animateStars(stars);
+        }
+      }}
+    />
+  </ReactCrop>
+</div>
+
+      {/* <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
+  {isImageLoading && (
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
+  )}
+  <ReactCrop
+    crop={crop}
+    onChange={(c) => setCrop(c)}
+    className={`max-h-[80%] max-w-[90%] ${
+      isImageLoading ? "hidden" : "block"
+    }`}
+  >
+    {isResultsLoading && (
+      <div
+        ref={starsContainerRef}
+        className="absolute inset-0 pointer-events-none z-10"
+      />
+    )}
+    <img
+      src={imageSource}
+      alt="Uploaded"
+      className="max-w-[90%] max-h-[80%] object-contain sm:max-w-[80vw] sm:max-h-[60vh]"
+      onLoad={() => {
+        setIsImageLoading(false);
+        if (starsContainerRef.current) {
+          const stars = createStars(200);
+          animateStars(stars);
+        }
+      }}
+    />
+  </ReactCrop>
+</div> */}
+
 
       {/* Action buttons */}
       <div className="action-buttons-group flex items-center rounded-xl" >
@@ -297,7 +332,7 @@ useEffect(() => {
 
   {/* Right Half - Results */}
   <div className="w-full h-1/2 lg:w-1/2 lg:h-full flex flex-col bg-white text-black">
-    {isLoading ? (
+  {isLoading ? (
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mb-4"></div>
         <p className="text-black">Rizzults are loadin'...</p>
@@ -306,8 +341,8 @@ useEffect(() => {
       <div className="flex-1 flex flex-col p-4 space-y-4 overflow-y-scroll">
         {isResultsLoading ? (
           <p>Searching for similar images...</p>
-        ) : Results.results.length === 0 ? (
-          <p>No similar images found.</p>
+        ) : Results.results.length === 0 && retryCount >= 2 ? (
+          <p>No similar images found after retries.</p>
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {Results.results.slice(0, 4).map((result, index) => (
@@ -334,11 +369,6 @@ useEffect(() => {
     </div>
   </div>
 </div>
-
-
-
-
-
     </div>
   );
 };
