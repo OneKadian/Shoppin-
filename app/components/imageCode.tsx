@@ -340,9 +340,9 @@ useEffect(() => {
     ) : (
       <div className="flex-1 flex flex-col p-4 space-y-4 overflow-y-scroll">
         {isResultsLoading ? (
-          <p>Searching for similar images...</p>
+          <p>Rizzults are loadin'... 🍓</p>
         ) : Results.results.length === 0 && retryCount >= 2 ? (
-          <p>No similar images found after retries.</p>
+          <p>Almost there, Hold on! 🍓</p>
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {Results.results.slice(0, 4).map((result, index) => (
