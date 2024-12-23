@@ -146,10 +146,10 @@ const fetchSuggestions = async (searchText: string) => {
   <div className="w-[80%] mx-auto lg:w-full lg:max-w-[585px] relative">
     <div
       ref={containerRef}
-      className={`relative bg-[#303134] ${
+      className={`relative  ${
         showSuggestions
-          ? 'rounded-t-2xl rounded-b-none border-b border-gray-700'
-          : 'rounded-full border border-gray-700'
+          ? 'rounded-t-2xl rounded-b-none border-b border-gray-700 bg-[#303134]'
+          : 'rounded-full border border-gray-700 bg-[#4d5156]'
       }`}
     >
       <div className="flex items-center px-4 py-3 h-[46px]">
@@ -194,14 +194,19 @@ const fetchSuggestions = async (searchText: string) => {
           style={{ top: '100%' }}
         >
           <div className="p-4 rounded-xl w-full lg:w-[585px]">
+                                {isTyping ? (
+                      <></>
+                    ) : (
             <h2 className="text-sm mb-3 text-gray-400">Trending searches</h2>
+
+                    )}
 
             {suggestions.length > 0 && (
               <div className="space-y-3">
                 {suggestions.map((item, index) => (
                   <div
                     key={index}
-                    className={`flex items-center gap-2 hover:bg-[#333333] p-1 rounded-lg cursor-pointer transition-colors duration-200 ${
+                    className={`flex items-center gap-2 hover:bg-[#3c4043] p-1 rounded-lg cursor-pointer transition-colors duration-200 ${
                       index === selectedIndex ? 'bg-[#333333]' : ''
                     }`}
                     onClick={() => handleSuggestionClick(item.text)}

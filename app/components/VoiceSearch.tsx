@@ -102,63 +102,53 @@ const VoiceSearch = ({ isOpen, onClose }: VoiceSearchProps) => {
       </button>
 
       <div className="w-full max-w-3xl lg:mb-40 mx-auto px-4">
-        <div className="flex flex-row items-center justify-between space-x-32">
+        <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0 lg:space-x-32">
+          {/* Constrain transcript width */}
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-gray-300 text-3xl"
+            className="text-gray-300 text-3xl text-center lg:text-left max-w-lg"
           >
             {transcript ? transcript : showInitialState ? "Speak now" : "Listening..."}
           </motion.span>
 
-          <div className="relative lg:flex items-center justify-center w-[180px] h-[180px] hidden">
+          {/* Circle with animation */}
+          <div className="relative flex items-center justify-center w-[180px] h-[180px]">
             {isListening && !showInitialState && (
               <motion.div
                 className="absolute inset-0 bg-white rounded-full"
                 initial={{ scale: 1 }}
-                animate={{ 
+                animate={{
                   scale: [1, 1.4, 1],
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
             )}
-            {/* <motion.div
-              className={`absolute z-10 w-32 h-32 rounded-full flex items-center justify-center ${
-                showInitialState ? 'bg-white' : 'bg-red-500'
-              }`}
-              style={{
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)'
-              }}
-            >
-              <Mic 
-                className={`w-16 h-16 ${showInitialState ? 'text-red-500' : 'text-white'}`} 
-              />
-            </motion.div> */}
+
             <motion.div
-  className={`relative z-10 w-32 h-32 rounded-full flex items-center justify-center ${
-    showInitialState ? 'bg-white' : 'bg-red-500'
-  }`}
->
-  <span
-    className={`material-symbols-outlined text-6xl ${
-      showInitialState ? 'text-red-500' : 'text-white'
-    }`}
-  >
-    mic
-  </span>
-</motion.div>
+              className={`relative z-10 w-32 h-32 rounded-full flex items-center justify-center ${
+                showInitialState ? "bg-white" : "bg-red-500"
+              }`}
+            >
+              <span
+                className={`material-symbols-outlined text-6xl ${
+                  showInitialState ? "text-red-500" : "text-white"
+                }`}
+              >
+                mic
+              </span>
+            </motion.div>
           </div>
         </div>
       </div>
     </motion.div>
   )}
 </AnimatePresence>
+
 
 
 );

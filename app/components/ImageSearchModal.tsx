@@ -76,7 +76,7 @@ const ImageSearchModal = ({ isOpen, onClose }: ImageSearchModalProps) => {
       {/* Main Modal */}
 {!isLoading && (
 
-<div className="fixed left-1/2 transform -translate-x-1/2 top-[180px] mt-[75px] lg:top-[225px] w-[92%] lg:w-[584px] z-40">
+<div className="fixed left-1/2 transform -translate-x-1/2 top-[180px] mt-[55px] lg:mt-[-2px] lg:top-[225px] w-[92%] lg:w-[584px] z-40">
   <div className="bg-[#303134] rounded-2xl mt-[100px] lg:mt-[130px] p-3 lg:p-4">
     <div className="flex items-center justify-between mb-3 lg:mb-4">
       <h2 className="text-white text-[14px] lg:text-[16px] font-semibold flex-1 text-center">
