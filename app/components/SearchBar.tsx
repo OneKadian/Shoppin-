@@ -144,15 +144,16 @@ const fetchSuggestions = async (searchText: string) => {
 
   return (
   <div className="w-[80%] mx-auto lg:w-full lg:max-w-[585px] relative">
+    <div className="flex justify-center">
     <div
       ref={containerRef}
-      className={`relative  ${
+      className={`relative w-[80%] lg:w-full ${
         showSuggestions
           ? 'rounded-t-2xl rounded-b-none border-b border-gray-700 bg-[#303134]'
           : 'rounded-full border border-gray-700 bg-[#4d5156]'
       }`}
     >
-      <div className="flex items-center px-4 py-3 h-[46px]">
+      <div className="flex items-center w-full px-4 py-3 h-[46px]">
         <Search className="w-5 h-5 text-gray-400 mr-3" />
         <input
           ref={inputRef}
@@ -182,18 +183,20 @@ const fetchSuggestions = async (searchText: string) => {
           </button>
         </div>
       </div>
-
+</div>
       <VoiceSearch
         isOpen={isVoiceSearchOpen}
         onClose={() => setIsVoiceSearchOpen(false)}
       />
 
       {showSuggestions && suggestions.length > 0 && (
+        <div className="flex justify-center">
+
         <div
-          className="absolute left-0 right-0 bg-[#303134] rounded-b-xl border-t border-gray-700 z-10"
+          className="absolute ml-11 lg:ml-0 flex justify-center items-center lg:w-full w-[80%] left-0 right-0 bg-[#303134] rounded-b-xl border-t border-gray-700 z-10"
           style={{ top: '100%' }}
         >
-          <div className="p-4 rounded-xl w-full lg:w-[585px]">
+          <div className="p-4 rounded-xl lg:w-[585px]">
                                 {isTyping ? (
                       <></>
                     ) : (
@@ -245,6 +248,8 @@ const fetchSuggestions = async (searchText: string) => {
             </div>
           </div>
         </div>
+
+</div>
       )}
     </div>
 
