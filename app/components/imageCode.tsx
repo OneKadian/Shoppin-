@@ -326,7 +326,8 @@ useEffect(() => {
 
     {/* Footer */}
     <div className="h-16 border-t border-gray-200 flex items-center justify-center gap-2">
-      <div className="flex items-center gap-2 text-sm text-gray-600">
+     <div className="flex justify-start w-1/2">
+      <div className="flex items-center gap-2 text-sm text-gray-600 px-2">
         <svg className="w-4 h-4" viewBox="0 0 24 24">
           <path
             fill="currentColor"
@@ -335,8 +336,11 @@ useEffect(() => {
         </svg>
         Did you find these results useful?
       </div>
-      <button className="text-sm text-blue-600 hover:underline">Yes</button>
-      <button className="text-sm text-blue-600 hover:underline">No</button>
+      </div>
+      <div className="flex justify-end w-1/2">
+      <button className="text-sm text-blue-600 hover:underline px-1">Yes</button>
+      <button className="text-sm text-blue-600 hover:underline px-1">No</button>
+    </div>
     </div>
   </div>
 </div>
