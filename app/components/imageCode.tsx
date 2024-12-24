@@ -235,99 +235,7 @@ useEffect(() => {
       </Button>
 
       {/* Original cropper */}
- {/* <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
-  {isImageLoading && (
-    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
-  )}
-  <ReactCrop
-    crop={crop}
-    onChange={(c) => setCrop(c)}
-    className={`max-h-[80%] max-w-[90%] ${
-      isImageLoading ? "hidden" : "block"
-    }`}
-  >
-    {isResultsLoading && (
-      <div
-        ref={starsContainerRef}
-        className="absolute inset-0 pointer-events-none z-10"
-      />
-    )}
-    <img
-      src={imageSource}
-      alt="Uploaded"
-      className="max-w-[90%] max-h-[50%] lg:max-h-[70%] sm:max-w-[80vw] sm:max-h-[50vh] object-contain"
-      onLoad={() => {
-        setIsImageLoading(false);
-        if (starsContainerRef.current) {
-          const stars = createStars(200);
-          animateStars(stars);
-        }
-      }}
-    />
-  </ReactCrop>
-</div> */}
 
-{/* <div className="relative w-full flex items-center justify-center mt-8 lg:mt-1">
-  {isImageLoading && (
-    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
-  )}
-  <ReactCrop
-    crop={crop}
-    onChange={(c) => setCrop(c)}
-    className={`${isImageLoading ? "hidden" : "block"}`}
-  >
-    {isResultsLoading && (
-      <div
-        ref={starsContainerRef}
-        className="absolute inset-0 pointer-events-none z-10"
-      />
-    )}
-    <img
-      src={imageSource}
-      alt="Uploaded"
-      className="max-w-[90vw] max-h-[60vh] md:max-h-[70vh] lg:max-h-[80vh] w-auto h-auto object-contain mx-auto"
-      onLoad={() => {
-        setIsImageLoading(false);
-        if (starsContainerRef.current) {
-          const stars = createStars(200);
-          animateStars(stars);
-        }
-      }}
-    />
-  </ReactCrop>
-</div> */}
-
-{/* <div className="relative w-full h-full flex items-center justify-center mt-8 lg:mt-1">
-  {isImageLoading && (
-    <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mb-4" />
-  )}
-  <ReactCrop
-    crop={crop}
-    onChange={(c) => setCrop(c)}
-    className={`w-full h-full ${isImageLoading ? "hidden" : "block"} flex justify-center items-center overflow-hidden`}
-  >
-    {isResultsLoading && (
-      <div
-        ref={starsContainerRef}
-        className="absolute inset-0 pointer-events-none z-10"
-      />
-    )}
-    <div className="flex justify-center items-center w-full h-full">
-      <img
-        src={imageSource}
-        alt="Uploaded"
-        className="max-w-[90%] max-h-[80vh] lg:max-w-[60%] lg:max-h-[70vh] object-contain"
-        onLoad={() => {
-          setIsImageLoading(false);
-          if (starsContainerRef.current) {
-            const stars = createStars(200);
-            animateStars(stars);
-          }
-        }}
-      />
-    </div>
-  </ReactCrop>
-</div> */}
 
 <div className="relative w-full flex items-center justify-center mt-8 lg:mt-1">
   {isImageLoading && (
@@ -336,7 +244,7 @@ useEffect(() => {
   <ReactCrop
     crop={crop}
     onChange={(c) => setCrop(c)}
-    className={`w-full h-full ${isImageLoading ? "hidden" : "block"} flex justify-center items-center overflow-hidden`}
+    className={`w-full h-full ${isImageLoading ? "hidden" : "block"} flex justify-center items-center overflow-hidden mt-2 lg:mt-0`}
   >
     {isResultsLoading && (
       <div
@@ -344,11 +252,13 @@ useEffect(() => {
         className="absolute inset-0 pointer-events-none z-10"
       />
     )}
-    <div className="flex justify-center items-center w-full h-full">
+    <div className="flex justify-center items-center  w-full h-full">
       <img
         src={imageSource}
         alt="Uploaded"
-        className="max-w-[90%] max-h-[80vh] lg:max-w-[60%] lg:max-h-[70vh] object-contain"
+        // className="max-w-[90%] max-h-[80vh] lg:max-w-[60%] lg:max-h-[70vh] object-contain"
+        className="max-w-[90%]  max-h-[250px] lg:max-w-[60%] lg:max-h-[70vh] object-contain"
+
         onLoad={() => {
           setIsImageLoading(false);
           if (starsContainerRef.current) {
