@@ -272,7 +272,7 @@ useEffect(() => {
 </div>
 
       {/* Action buttons */}
-      <div className="action-buttons-group flex items-center rounded-xl" >
+      <div className="action-buttons-group flex items-center rounded-full" >
         <button
           className={`action-button ${
             activeButton === "search" ? "active" : "inactive"
